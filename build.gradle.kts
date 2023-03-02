@@ -1,7 +1,6 @@
 plugins {
     kotlin("jvm")
     id("org.springframework.boot")
-    id("io.spring.dependency-management") version "1.1.0"
     id("com.bmuschko.docker-spring-boot-application") version "7.1.0"
     id("maven-publish")
     id("io.github.gradle-nexus.publish-plugin")
@@ -93,6 +92,7 @@ docker {
 
 dependencies {
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${project.property("spring-cloud.version")}"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:${project.property("spring-boot.version")}"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.cloud:spring-cloud-config-server")
