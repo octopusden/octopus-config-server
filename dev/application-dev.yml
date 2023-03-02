@@ -1,0 +1,7 @@
+# need to set personal ssh cert passphrase into env var ${SSH_PASSPHRASE}
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          ignore-local-ssh-settings: false
