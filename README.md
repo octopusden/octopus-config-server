@@ -11,4 +11,8 @@ SPRING_CLOUD_CONFIG_SERVER_GIT_PASSPHRASE=
 # Hashicorp Vault hostname, e.g. vault.domain.corp
 SPRING_CLOUD_CONFIG_SERVER_VAULT_HOST=
 ```
-- Run ConfigServerApplication (dev) via IntelliJ Idea
+- Run ConfigServerApplication (dev) via IntelliJ Idea or launch via shell
+
+```shell
+./gradlew bootRun --args='--spring.profiles.active=dev --spring.config.additional-location=dev/'
+```
