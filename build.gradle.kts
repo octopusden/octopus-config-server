@@ -14,12 +14,6 @@ java {
     withSourcesJar()
 }
 
-tasks.withType<GenerateModuleMetadata> {
-    // The value 'enforced-platform' is provided in the validation
-    // error message
-    suppressedValidationErrors.add("enforced-platform")
-}
-
 repositories {
     mavenCentral()
 }
