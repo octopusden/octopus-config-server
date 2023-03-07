@@ -1,4 +1,4 @@
-rootProject.name = "config-server"
+rootProject.name = "octopus-config-server"
 
 pluginManagement {
     plugins {
