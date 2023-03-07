@@ -1,5 +1,7 @@
 # need to set personal ssh cert passphrase into env var ${SSH_PASSPHRASE}
 spring:
+  profile:
+    include: git,vault
   cloud:
     config:
       server:
