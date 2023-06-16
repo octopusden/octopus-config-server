@@ -8,5 +8,5 @@ jobs:
     with:
       flow-type: public
       java-version: '11'
-      docker-image: config-service
+      docker-image: config-server
     secrets: inherit
