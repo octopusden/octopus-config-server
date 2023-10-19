@@ -76,11 +76,14 @@ springBoot {
     buildInfo()
 }
 
+val dockerRegistry = System.getenv().getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]) as? String
+val octopusGithubDockerRegistry = System.getenv().getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", project.properties["octopus.github.docker.registry"]) as? String
+
 docker {
     springBootApplication {
-        baseImage.set("${rootProject.properties["docker.registry"]}/openjdk:11")
-        ports.set(listOf(8765, 8765))
-        images.set(setOf("${rootProject.properties["publishing.docker.registry"]}/${project.name}:${project.version}"))
+        baseImage.set("$dockerRegistry/openjdk:11")
+        ports.set(listOf(8888, 8888))
+        images.set(setOf("$octopusGithubDockerRegistry/octopusden/${project.name}:${project.version}"))
     }
 }
 
@@ -92,4 +95,17 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-config-server")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus:1.10.4")
+}
+
+fun validateDockerRegistryParams() {
+    if (dockerRegistry.isNullOrBlank() || octopusGithubDockerRegistry.isNullOrBlank()) {
+        throw IllegalArgumentException(
+            "Start gradle build with" +
+                    (if (dockerRegistry.isNullOrBlank()) " -Pdocker.registry=..." else "") +
+                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " -Poctopus.github.docker.registry=..." else "") +
+                    " or set env variable(s):" +
+                    (if (dockerRegistry.isNullOrBlank()) " DOCKER_REGISTRY" else "") +
+                    (if (octopusGithubDockerRegistry.isNullOrBlank()) " OCTOPUS_GITHUB_DOCKER_REGISTRY" else "")
+        )
+    }
 }
