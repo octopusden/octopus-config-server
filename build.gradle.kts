@@ -87,6 +87,10 @@ docker {
     }
 }
 
+tasks.getByName("dockerBuildImage").doFirst {
+    validateDockerRegistryParams()
+}
+
 dependencies {
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${project.property("spring-cloud.version")}"))
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${project.property("spring-boot.version")}"))
