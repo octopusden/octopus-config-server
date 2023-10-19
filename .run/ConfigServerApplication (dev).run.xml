@@ -9,7 +9,7 @@
       </param>
     </additionalParameters>
     <option name="HIDE_BANNER" value="true" />
-    <module name="octopus-config-server.main" />
+    <module name="config-server.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="ConfigServerApplication" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />
