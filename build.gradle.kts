@@ -50,7 +50,7 @@ publishing {
                     }
                 }
                 scm {
-                    url.set("https://github.com/kzaporozhtsev/octopus-config-server.git")
+                    url.set("https://github.com/octopusden/octopus-config-server.git")
                     connection.set("scm:git://github.com/octopusden/octopus-config-server.git")
                 }
                 developers {
