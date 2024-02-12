@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm")
     id("org.springframework.boot")
-    id("com.bmuschko.docker-spring-boot-application") version "7.1.0"
+    id("com.bmuschko.docker-spring-boot-application")
     id("maven-publish")
     id("io.github.gradle-nexus.publish-plugin")
     signing
@@ -81,7 +81,7 @@ val octopusGithubDockerRegistry = System.getenv().getOrDefault("OCTOPUS_GITHUB_D
 
 docker {
     springBootApplication {
-        baseImage.set("$dockerRegistry/openjdk:11")
+        baseImage.set("$dockerRegistry/openjdk:21-oracle")
         ports.set(listOf(8888, 8888))
         images.set(setOf("$octopusGithubDockerRegistry/octopusden/${project.name}:${project.version}"))
     }
@@ -89,6 +89,12 @@ docker {
 
 tasks.getByName("dockerBuildImage").doFirst {
     validateDockerRegistryParams()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "21"
+    }
 }
 
 dependencies {
