@@ -13,6 +13,7 @@ spring:
           passphrase: ${SSH_PASSPHRASE}
           private-key: ${SSH_KEY}
           order: 1
+          default-label: master
         vault:
           host: # set on deployment via ENV
           port: 443
