@@ -11,6 +11,13 @@ plugins {
 }
 
 octopusQuality {
+    // Regression guard: this repository must publish NOTHING to Maven Central, so the declared
+    // set is deliberately empty. Adding a publication anywhere — including to the root project —
+    // fails this task rather than silently reappearing on Central at the next release.
+    publication {
+        enforceCentralPublications.set(true)
+        centralPublications.set(emptySet())
+    }
     // Repo has no tests / no coverage tool yet — disable coverage verification.
     coverage {
         enabled.set(false)
@@ -44,46 +51,11 @@ nexusPublishing {
     }
 }
 
-publishing {
-    repositories {
-        maven {
-        }
-    }
-    publications {
-        create<MavenPublication>("bootJar") {
-            from(components["java"])
-            artifact(tasks.getByName("bootJar"))
-            pom {
-                name.set(project.name)
-                description.set("Octopus module: ${project.name}")
-                url.set("https://github.com/octopusden/octopus-config-server.git")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                scm {
-                    url.set("https://github.com/octopusden/octopus-config-server.git")
-                    connection.set("scm:git://github.com/octopusden/octopus-config-server.git")
-                }
-                developers {
-                    developer {
-                        id.set("octopus")
-                        name.set("octopus")
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["bootJar"])
-}
+// No Maven publication is declared here on purpose: this module's deliverable is the docker
+// image built from `bootJar`, and no known consumer resolves it as a Maven dependency (see
+// release.yml). `maven-publish` and `signing` stay applied so `publish` / `publishToSonatype`
+// keep existing as no-op lifecycle tasks, and the `octopusQuality { publication { } }` guard
+// above (with an empty declared set) fails if a publication reappears here.
 
 springBoot {
     buildInfo()
