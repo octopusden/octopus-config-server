@@ -2,18 +2,15 @@ plugins {
     kotlin("jvm")
     id("org.springframework.boot")
     id("com.bmuschko.docker-spring-boot-application")
-    id("maven-publish")
-    id("io.github.gradle-nexus.publish-plugin")
-    signing
     id("io.gitlab.arturbosch.detekt")
     id("org.jlleitschuh.gradle.ktlint")
     id("org.octopusden.octopus-quality")
 }
 
 octopusQuality {
-    // Regression guard: this repository must publish NOTHING to Maven Central, so the declared
-    // set is deliberately empty. Adding a publication anywhere — including to the root project —
-    // fails this task rather than silently reappearing on Central at the next release.
+    // Regression guard: this repository publishes nothing, so the declared set is deliberately
+    // empty. Re-adding a publication anywhere fails this task instead of quietly reappearing on
+    // Maven Central at the next release.
     publication {
         enforceCentralPublications.set(true)
         centralPublications.set(emptySet())
@@ -29,33 +26,17 @@ octopusQuality {
     }
 }
 
+// Read by `springBoot { buildInfo() }` into build-info.properties, not a publishing coordinate.
 group = "org.octopusden.cloud.config-server"
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
 
 repositories {
     mavenCentral()
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
-            username.set(System.getenv("MAVEN_USERNAME"))
-            password.set(System.getenv("MAVEN_PASSWORD"))
-        }
-    }
-}
-
-// No Maven publication is declared here on purpose: this module's deliverable is the docker
-// image built from `bootJar`, and no known consumer resolves it as a Maven dependency (see
-// release.yml). `maven-publish` and `signing` stay applied so `publish` / `publishToSonatype`
-// keep existing as no-op lifecycle tasks, and the `octopusQuality { publication { } }` guard
-// above (with an empty declared set) fails if a publication reappears here.
+// Nothing is published from this repository — not to Maven Central, not to GitHub Packages; the
+// deliverable is the docker image built from `bootJar`. Hence no `maven-publish`, no `signing`
+// and no Sonatype plugin. The guard above still runs on every `check` whether or not
+// `maven-publish` is applied, and fails the build if a publication reappears.
 
 springBoot {
     buildInfo()
