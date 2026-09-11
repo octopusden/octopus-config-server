@@ -2,15 +2,19 @@ plugins {
     kotlin("jvm")
     id("org.springframework.boot")
     id("com.bmuschko.docker-spring-boot-application")
-    id("maven-publish")
-    id("io.github.gradle-nexus.publish-plugin")
-    signing
     id("io.gitlab.arturbosch.detekt")
     id("org.jlleitschuh.gradle.ktlint")
     id("org.octopusden.octopus-quality")
 }
 
 octopusQuality {
+    // Regression guard: this repository publishes nothing, so the declared set is deliberately
+    // empty. Re-adding a publication anywhere fails this task instead of quietly reappearing on
+    // Maven Central at the next release.
+    publication {
+        enforceCentralPublications.set(true)
+        centralPublications.set(emptySet())
+    }
     // Repo has no tests / no coverage tool yet — disable coverage verification.
     coverage {
         enabled.set(false)
@@ -22,68 +26,17 @@ octopusQuality {
     }
 }
 
+// Read by `springBoot { buildInfo() }` into build-info.properties, not a publishing coordinate.
 group = "org.octopusden.cloud.config-server"
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
 
 repositories {
     mavenCentral()
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
-            username.set(System.getenv("MAVEN_USERNAME"))
-            password.set(System.getenv("MAVEN_PASSWORD"))
-        }
-    }
-}
-
-publishing {
-    repositories {
-        maven {
-        }
-    }
-    publications {
-        create<MavenPublication>("bootJar") {
-            from(components["java"])
-            artifact(tasks.getByName("bootJar"))
-            pom {
-                name.set(project.name)
-                description.set("Octopus module: ${project.name}")
-                url.set("https://github.com/octopusden/octopus-config-server.git")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                scm {
-                    url.set("https://github.com/octopusden/octopus-config-server.git")
-                    connection.set("scm:git://github.com/octopusden/octopus-config-server.git")
-                }
-                developers {
-                    developer {
-                        id.set("octopus")
-                        name.set("octopus")
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["bootJar"])
-}
+// Nothing is published from this repository — not to Maven Central, not to GitHub Packages; the
+// deliverable is the docker image built from `bootJar`. Hence no `maven-publish`, no `signing`
+// and no Sonatype plugin. The guard above still runs on every `check` whether or not
+// `maven-publish` is applied, and fails the build if a publication reappears.
 
 springBoot {
     buildInfo()
